@@ -60,6 +60,7 @@ import static xiao.Helper.*;
 
 🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶
 ### TODO
+- 写一些示例代码
 - knownSize
 - 改成基于 Iterable? 区分 OnceIter?
 - fun0~4 添加 compose andThen 等默认方法? 或者静态方法?
