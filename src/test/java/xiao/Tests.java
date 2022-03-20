@@ -6,6 +6,8 @@ import lombok.val;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicMarkableReference;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static xiao.Helper.*;
 import static xiao.Data.*;
@@ -21,9 +23,7 @@ import static xiao.Test.*;
  * @author chuxiaofeng
  */
 public interface Tests {
-
     static void main(String[] ignored) {
-
         factory_methods();
         transforms();
         queries();

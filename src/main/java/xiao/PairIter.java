@@ -9,7 +9,7 @@ import static xiao.Helper.*;
 /**
  * @author chuxiaofeng
  */
-public interface PairIter<A, B> extends Iter<Pair<? extends A, ? extends B>> {
+public interface PairIter<A, B> extends Iter<Pair<A, B>> {
 
     default Map<A, B> toMap() {
         return IterFuns.putAll(new HashMap<>(), this);

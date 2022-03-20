@@ -47,33 +47,16 @@ public interface IterFuns {
     static <A> boolean isEmpty(Iterable<? extends A> i) { return isEmpty(i.iterator()); }
     static <A> boolean nonEmpty(Iterator<? extends A> i) { return !isEmpty(i); }
     static <A> boolean nonEmpty(Iterable<? extends A> i) { return nonEmpty(i.iterator()); }
-    static <A> Iter<A> tail(Iterator<? extends A> i) {
-        if (isEmpty(i)) throw new UnsupportedOperationException();
-        return drop(i, 1);
-    }
-    static <A> Iter<A> tail(Iterable<? extends A> i) { return tail(i.iterator()); }
     static <A> Iter<A> init(Iterator<? extends A> i) {
         if (isEmpty(i)) throw new UnsupportedOperationException();
         return dropRight(i, 1);
     }
     static <A> Iter<A> init(Iterable<? extends A> i) { return init(i.iterator()); }
-    static <A> Iter<Iter<A>> tails(Iterator<? extends A> i) {
-        // iterate(iter(i), Iter::tail).takeWhile(Iter::nonEmpty).concat(Iter(Iter.empty()));
-        // start, f(start), f(f(start)) ...
-        Iter<A> start = iter(i);
-        return new Iter<Iter<A>>() {
-            boolean first = true;
-            Iter<A> acc = start;
-            @Override public boolean hasNext() { return !acc.isEmpty(); }
-            @Override public Iter<A> next() {
-                if (first) first = false;
-                Pair<Iter<A>, Iter<A>> dup = IterFuns.duplicate(acc);
-                acc = dup._1.tail();
-                return dup._2;
-            }
-        }.concat(Iter(Iter.empty()));
+    static <A> Iter<A> tail(Iterator<? extends A> i) {
+        if (isEmpty(i)) throw new UnsupportedOperationException();
+        return drop(i, 1);
     }
-    static <A> Iter<Iter<A>> tails(Iterable<? extends A> i) { return tails(i.iterator()); }
+    static <A> Iter<A> tail(Iterable<? extends A> i) { return tail(i.iterator()); }
     static <A> Iter<Iter<A>> inits(Iterator<? extends A> i) {
         // iterate(iter(i), Iter::init).takeWhile(Iter::nonEmpty).concat(Iter(Iter.empty()));
         // start, f(start), f(f(start)) ...
@@ -91,6 +74,23 @@ public interface IterFuns {
         }.concat(Iter(Iter.empty()));
     }
     static <A> Iter<Iter<A>> inits(Iterable<? extends A> i) { return inits(i.iterator()); }
+    static <A> Iter<Iter<A>> tails(Iterator<? extends A> i) {
+        // iterate(iter(i), Iter::tail).takeWhile(Iter::nonEmpty).concat(Iter(Iter.empty()));
+        // start, f(start), f(f(start)) ...
+        Iter<A> start = iter(i);
+        return new Iter<Iter<A>>() {
+            boolean first = true;
+            Iter<A> acc = start;
+            @Override public boolean hasNext() { return !acc.isEmpty(); }
+            @Override public Iter<A> next() {
+                if (first) first = false;
+                Pair<Iter<A>, Iter<A>> dup = IterFuns.duplicate(acc);
+                acc = dup._1.tail();
+                return dup._2;
+            }
+        }.concat(Iter(Iter.empty()));
+    }
+    static <A> Iter<Iter<A>> tails(Iterable<? extends A> i) { return tails(i.iterator()); }
 
     // 🍓🍅🥝🥥🍍🥭🍑🍒🍈🫐 翻转 & 去重 🔴🍇🍉🍌🍋🍊🍐🍎🍏
     static <A> Iter<A> reverse(Iterator<? extends A> i) { return new ReverseIter<>(i); }
@@ -992,9 +992,9 @@ public interface IterFuns {
         }
         return a;
     }
-    static <A extends Map<B, C>, B, C> A putAll(A m, Iterator<Pair<? extends B, ? extends C>> i) {
+    static <A extends Map<B, C>, B, C> A putAll(A m, Iterator<Pair<B, C>> i) {
         while (i.hasNext()) {
-            Pair<? extends B, ? extends C> it = i.next();
+            Pair<B, C> it = i.next();
             m.put(it._1, it._2);
         }
         return m;

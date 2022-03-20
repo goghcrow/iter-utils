@@ -3,7 +3,6 @@ package xiao;
 import lombok.Value;
 import xiao.Data.Option.None;
 import xiao.Data.Option.Some;
-import xiao.Helper.*;
 
 import java.util.*;
 
@@ -17,12 +16,12 @@ import static xiao.Iterators.*;
 @SuppressWarnings("unused")
 public interface Data {
 
-    static <A> Ref<A> Ref(A v)                { return new Ref<>(v);             }
+    static <A> Ref<A>  Ref(A v)               { return new Ref<>(v);             }
     static <A> Lazy<A> Lazy(A v)              { return new Lazy<>(() -> v);      }
     static <A> Lazy<A> Lazy(Fun0<A> t)        { return new Lazy<>(t);            }
 
-    static<A> None<A> None()                  { return new Option.None<>();      }
-    static<A> Some<A> Some(A value)           { return new Option.Some<>(value); }
+    static <A> None<A>         None()         { return new Option.None<>();      }
+    static <A> Some<A>         Some(A value)  { return new Option.Some<>(value); }
     static <L, R> Either<L, R> Left(L value)  { return new Either.Left<>(value); }
     static <L, R> Either<L, R> Right(R value) { return new Either.Right<>(value);}
 
@@ -81,9 +80,6 @@ public interface Data {
     @SafeVarargs static <A extends Comparable<? super A>, B> SortedMap<A, B> SortedMap(Pair<A, B>... xs) {
         return SortedMap(Iter(xs));
     }
-    static <A extends Comparable<? super A>, B> SortedMap<A, B> SortedMap(Iterable<Pair<A, B>> i) {
-        return SortedMap(i.iterator());
-    }
     static <A extends Comparable<? super A>, B> SortedMap<A, B> SortedMap(Iterator<Pair<A, B>> i) {
         SortedMap<A, B> m = new TreeMap<>();
         while (i.hasNext()) {
@@ -92,23 +88,20 @@ public interface Data {
         }
         return Collections.unmodifiableSortedMap(m);
     }
-    static <K, V> SortedMap<K, V> SortedMap(Comparator<? super K> cmp) {
-        return new TreeMap<>(cmp);
-    }
-    static <K, V> SortedMap<K, V> SortedMap(Iterable<Pair<K, V>> i, Comparator<? super K> cmp) {
-        return SortedMap(i.iterator(), cmp);
-    }
+    static <A extends Comparable<? super A>, B> SortedMap<A, B> SortedMap(Iterable<Pair<A, B>> i) { return SortedMap(i.iterator()); }
     static <K, V> SortedMap<K, V> SortedMap(Iterator<Pair<K, V>> i, Comparator<? super K> cmp) {
-        SortedMap<K, V> m = SortedMap(cmp);
+        SortedMap<K, V> m = new TreeMap<>(cmp);
         while (i.hasNext()) {
             Pair<K, V> p = i.next();
             m.put(p._1, p._2);
         }
         return Collections.unmodifiableSortedMap(m);
     }
+    static <K, V> SortedMap<K, V> SortedMap(Iterable<Pair<K, V>> i, Comparator<? super K> cmp) { return SortedMap(i.iterator(), cmp); }
 
     // 🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶🥶
 
+    // 也可以直接使用 Atomic*, AtomicReference
     final class Ref<T> {
         T val;
         public Ref(T val) { this.val = val; }

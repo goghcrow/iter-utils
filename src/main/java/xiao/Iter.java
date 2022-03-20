@@ -101,7 +101,7 @@ public interface Iter<A> extends Iterator<A> {
 
     // 🍓🍅🥝🥥🍍🥭🍑🍒🍈🫐 basic 🔴🍇🍉🍌🍋🍊🍐🍎🍏
     default int         knownSize() { return -1;                                }
-    default Option<A>   nextOption(){ return IterFuns.nextOption(this);         }
+    default Option<A>   nextOption(){ return IterFuns.nextOption(this);      }
     default A           head()      { return IterFuns.head(this);            }
     default Option<A>   headOption(){ return IterFuns.headOption(this);      }
     default A           last()      { return IterFuns.last(this);            }
@@ -109,10 +109,10 @@ public interface Iter<A> extends Iterator<A> {
     default int         size()      { return IterFuns.size(this);            }
     default boolean     isEmpty()   { return IterFuns.isEmpty(this);         }
     default boolean     nonEmpty()  { return IterFuns.nonEmpty(this);        }
-    default Iter<A>     tail()      { return IterFuns.tail(this);            }
     default Iter<A>     init()      { return IterFuns.init(this);            }
-    default Iter<Iter<A>> tails()   { return IterFuns.tails(this);           }
+    default Iter<A>     tail()      { return IterFuns.tail(this);            }
     default Iter<Iter<A>> inits()   { return IterFuns.inits(this);           }
+    default Iter<Iter<A>> tails()   { return IterFuns.tails(this);           }
 
     // 🍓🍅🥝🥥🍍🥭🍑🍒🍈🫐 翻转 & 去重 🔴🍇🍉🍌🍋🍊🍐🍎🍏
     default Iter<A>     reverse()  { return IterFuns.reverse(this);  }
