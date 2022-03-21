@@ -4,6 +4,7 @@ import lombok.val;
 import xiao.Iterators.*;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static xiao.Data.*;
 import static xiao.Funs.*;
@@ -21,6 +22,18 @@ public interface IterFuns {
 
     // 🍓🍅🥝🥥🍍🥭🍑🍒🍈🫐 basic 🔴🍇🍉🍌🍋🍊🍐🍎🍏
     static int knownSize(Iterator<?> i) { return i instanceof Iter ? ((Iter<?>) i).knownSize() : -1; }
+    static <A> int size(Iterator<? extends A> i) {
+        int l = 0;
+        while (i.hasNext()) {
+            l++; i.next();
+        }
+        return l;
+    }
+    static <A> int size(Iterable<? extends A> i) { return size(i.iterator()); }
+    static <A> boolean isEmpty(Iterator<? extends A> i) { return !i.hasNext(); }
+    static <A> boolean isEmpty(Iterable<? extends A> i) { return isEmpty(i.iterator()); }
+    static <A> boolean nonEmpty(Iterator<? extends A> i) { return !isEmpty(i); }
+    static <A> boolean nonEmpty(Iterable<? extends A> i) { return nonEmpty(i.iterator()); }
     static <A> Option<A> nextOption(Iterator<? extends A> i) { return i.hasNext() ? Some(i.next()) : None(); }
     static <A> Option<A> nextOption(Iterable<? extends A> i) { return nextOption(i.iterator()); }
     static <A> A head(Iterator<? extends A> i) { return i.next(); }
@@ -35,18 +48,6 @@ public interface IterFuns {
     static <A> A last(Iterable<? extends A> i) { return last(i.iterator()); }
     static <A> Option<A> lastOption(Iterator<? extends A> i) { return isEmpty(i) ? None() : Some(last(i)); }
     static <A> Option<A> lastOption(Iterable<? extends A> i) { return lastOption(i.iterator()); }
-    static <A> int size(Iterator<? extends A> i) {
-        int l = 0;
-        while (i.hasNext()) {
-            l++; i.next();
-        }
-        return l;
-    }
-    static <A> int size(Iterable<? extends A> i) { return size(i.iterator()); }
-    static <A> boolean isEmpty(Iterator<? extends A> i) { return !i.hasNext(); }
-    static <A> boolean isEmpty(Iterable<? extends A> i) { return isEmpty(i.iterator()); }
-    static <A> boolean nonEmpty(Iterator<? extends A> i) { return !isEmpty(i); }
-    static <A> boolean nonEmpty(Iterable<? extends A> i) { return nonEmpty(i.iterator()); }
     static <A> Iter<A> init(Iterator<? extends A> i) {
         if (isEmpty(i)) throw new UnsupportedOperationException();
         return dropRight(i, 1);
@@ -999,6 +1000,13 @@ public interface IterFuns {
         }
         return m;
     }
+    static <A> Iterable<A> toIterable(Iterator<? extends A> i)    { return toList(i);                     }
+    static <A> List<A>     toList(Iterator<? extends A> i)        { return addAll(new ArrayList<>(), i);  }
+    static <A> A[]         toArray(Iterator<? extends A> i, A[] a){ return toList(i).toArray(a);          }
+    static <A> Set<A>      toSet(Iterator<? extends A> i)         { return addAll(new HashSet<>(), i);    }
+    static <A> SortedSet<A>toSortedSet(Iterator<? extends A> i, Comparator<? super A> cmp)
+                                                                  { return addAll(new TreeSet<>(cmp), i); }
+    static <A> Stream<A>   toStream(Iterator<? extends A> i)      { return IterFuns.<A>toList(i).stream();}
     static <A> BufferedIter<A> buffered(Iterator<? extends A> i) {
         return new BufferedIter<A>() {
             A nxt;
@@ -1027,6 +1035,7 @@ public interface IterFuns {
         };
     }
     static <A> BufferedIter<A> buffered(Iterable<? extends A> i) { return buffered(i.iterator()); }
+
 
 
     // 应该放到 Iterators, BUT 编译不过 ...

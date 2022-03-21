@@ -21,6 +21,8 @@ public interface Iter<A> extends Iterator<A> {
     static <A> Iter<A>             single(A a) { return Iter(a); }
     @SafeVarargs
     static <A> Iter<A>             concat(Iterator<? extends A>...xss) { return IterFuns.flatten(xss); }
+    @SafeVarargs
+    static <A> Iter<A>             concat(Iterable<? extends A>...xss) { return IterFuns.flatten(xss); }
     static <A> Iter<A>             fill(int len, Fun0<? extends A> elem) {
         return new Iter<A>() {
             int i = 0;
@@ -101,14 +103,14 @@ public interface Iter<A> extends Iterator<A> {
 
     // 🍓🍅🥝🥥🍍🥭🍑🍒🍈🫐 basic 🔴🍇🍉🍌🍋🍊🍐🍎🍏
     default int         knownSize() { return -1;                                }
+    default int         size()      { return IterFuns.size(this);            }
+    default boolean     isEmpty()   { return IterFuns.isEmpty(this);         }
+    default boolean     nonEmpty()  { return IterFuns.nonEmpty(this);        }
     default Option<A>   nextOption(){ return IterFuns.nextOption(this);      }
     default A           head()      { return IterFuns.head(this);            }
     default Option<A>   headOption(){ return IterFuns.headOption(this);      }
     default A           last()      { return IterFuns.last(this);            }
     default Option<A>   lastOption(){ return IterFuns.lastOption(this);      }
-    default int         size()      { return IterFuns.size(this);            }
-    default boolean     isEmpty()   { return IterFuns.isEmpty(this);         }
-    default boolean     nonEmpty()  { return IterFuns.nonEmpty(this);        }
     default Iter<A>     init()      { return IterFuns.init(this);            }
     default Iter<A>     tail()      { return IterFuns.tail(this);            }
     default Iter<Iter<A>> inits()   { return IterFuns.inits(this);           }
@@ -252,11 +254,11 @@ public interface Iter<A> extends Iterator<A> {
 
     // 🍓🍅🥝🥥🍍🥭🍑🍒🍈🫐 toXXX 🔴🍇🍉🍌🍋🍊🍐🍎🍏
     // 注意: 之所以不返回 () -> this; 是因为 iterable.iterator() 每次返回一个新的迭代器
-    default Iterable<A> toIterable()    { return toList();                                    }
-    default List<A>     toList()        { return IterFuns.addAll(new ArrayList<>(), this); }
-    default A[]         toArray(A[] a)  { return toList().toArray(a);                         }
-    default Set<A>      toSet()         { return IterFuns.addAll(new HashSet<>(), this);   }
-    default SortedSet<A>toSortedSet(Comparator<? super A> cmp) { return IterFuns.addAll(new TreeSet<>(cmp), this); }
-    default Stream<A>   toStream()      { return toList().stream();                           }
-    default BufferedIter<A> buffered()  { return IterFuns.buffered(this);                  }
+    default Iterable<A> toIterable()    { return IterFuns.toIterable(this); }
+    default List<A>     toList()        { return IterFuns.toList(this);     }
+    default A[]         toArray(A[] a)  { return IterFuns.toArray(this, a); }
+    default Set<A>      toSet()         { return IterFuns.toSet(this);      }
+    default SortedSet<A>toSortedSet(Comparator<? super A> cmp) { return IterFuns.toSortedSet(this, cmp); }
+    default Stream<A>   toStream()      { return IterFuns.toStream(this);   }
+    default BufferedIter<A> buffered()  { return IterFuns.buffered(this);   }
 }
