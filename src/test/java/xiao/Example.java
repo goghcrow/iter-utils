@@ -102,181 +102,6 @@ public interface Example {
         });
     }
 
-    static void iter_factory() {
-        assertEquals(
-                empty(),
-                Iter()
-        );
-
-        assertEquals(
-                single(1),
-                Iter(1)
-        );
-
-        test("fill", () -> {
-            assertEquals(
-                    Iter.fill(5, () -> 42),
-                    Iter(42, 42, 42, 42, 42)
-            );
-            assertEquals(
-                    Iter.fill(5, 3, () -> "A").map(Iter::toList),
-                    Iter(
-                            List("A", "A", "A"),
-                            List("A", "A", "A"),
-                            List("A", "A", "A"),
-                            List("A", "A", "A"),
-                            List("A", "A", "A")
-                    )
-            );
-            assertEquals(
-                    Iter.fill(5, 3, 2, () -> "A").map(it -> it.map(Iter::toList).toList()),
-                    Iter(
-                            List(
-                                    List("A", "A"),
-                                    List("A", "A"),
-                                    List("A", "A")
-                            ),
-                            List(
-                                    List("A", "A"),
-                                    List("A", "A"),
-                                    List("A", "A")
-                            ),
-                            List(
-                                    List("A", "A"),
-                                    List("A", "A"),
-                                    List("A", "A")
-                            ),
-                            List(
-                                    List("A", "A"),
-                                    List("A", "A"),
-                                    List("A", "A")
-                            ),
-                            List(
-                                    List("A", "A"),
-                                    List("A", "A"),
-                                    List("A", "A")
-                            )
-                    )
-            );
-
-            assertEquals(
-                    fill(2, () -> 1),
-                    Iter(1, 1)
-            );
-            assertEquals(
-                    fill(5, () -> "hello"),
-                    Iter("hello", "hello", "hello", "hello", "hello")
-            );
-        });
-
-        test("tabulate", () -> {
-            assertEquals(
-                    tabulate(3, Object::toString),
-                    range(0, 3).map(Object::toString)
-            );
-            assertEquals(
-                    tabulate(5, i -> "hello " + i),
-                    Iter("hello 0", "hello 1", "hello 2", "hello 3", "hello 4")
-            );
-            assertEquals(
-                    tabulate(5, i -> i),
-                    Iter(0, 1, 2, 3, 4))
-            ;
-            assertEquals(
-                    tabulate(5, 3, Data::Pair).map(Iter::toList),
-                    Iter(
-                            List(Tuple(0, 0), Tuple(0, 1), Tuple(0, 2)),
-                            List(Tuple(1, 0), Tuple(1, 1), Tuple(1, 2)),
-                            List(Tuple(2, 0), Tuple(2, 1), Tuple(2, 2)),
-                            List(Tuple(3, 0), Tuple(3, 1), Tuple(3, 2)),
-                            List(Tuple(4, 0), Tuple(4, 1), Tuple(4, 2))
-                    )
-            );
-            assertEquals(
-                    tabulate(5, 3, 2, Data::Tuple).map(it1 -> it1.map(Iter::toList).toList()),
-                    Iter(
-                            List(List(Tuple(0, 0, 0), Tuple(0, 0, 1)), List(Tuple(0, 1, 0), Tuple(0, 1, 1)), List(Tuple(0, 2, 0), Tuple(0, 2, 1))),
-                            List(List(Tuple(1, 0, 0), Tuple(1, 0, 1)), List(Tuple(1, 1, 0), Tuple(1, 1, 1)), List(Tuple(1, 2, 0), Tuple(1, 2, 1))),
-                            List(List(Tuple(2, 0, 0), Tuple(2, 0, 1)), List(Tuple(2, 1, 0), Tuple(2, 1, 1)), List(Tuple(2, 2, 0), Tuple(2, 2, 1))),
-                            List(List(Tuple(3, 0, 0), Tuple(3, 0, 1)), List(Tuple(3, 1, 0), Tuple(3, 1, 1)), List(Tuple(3, 2, 0), Tuple(3, 2, 1))),
-                            List(List(Tuple(4, 0, 0), Tuple(4, 0, 1)), List(Tuple(4, 1, 0), Tuple(4, 1, 1)), List(Tuple(4, 2, 0), Tuple(4, 2, 1))))
-                    );
-        });
-
-        test("range", () -> {
-            assertEquals(
-                    range(1, 7),
-                    concat(List(1, 2), List(3, 4), List(5, 6))
-            );
-            assertEquals(
-                    range(1, 4),
-                    Iter(1, 2, 3)
-            );
-            assertEquals(
-                    range(3, 0, -1),
-                    Iter(3, 2, 1)
-            );
-            assertEquals(
-                    range(1, 10, 2),
-                    Iter(1, 3, 5, 7, 9)
-            );
-            assertEquals(range(Integer.MAX_VALUE - 3, Integer.MAX_VALUE, 2), Iter(2147483644, 2147483646));
-            assertEquals(range(1, 5, 2), Iter(1, 3));
-            assertEquals(range(1, -5, -2), Iter(1, -1, -3));
-        });
-
-        test("from", () -> {
-            assertEquals(
-                    from(1).take(3),
-                    Iter(1, 2, 3)
-            );
-            assertEquals(
-                    from(1, 2).take(3),
-                    Iter(1, 3, 5)
-            );
-            assertEquals(from(1, 2).take(3), Iter(1, 3, 5));
-            assertEquals(from(1, -2).take(3), Iter(1, -1, -3));
-        });
-
-        test("iterate", () -> {
-            // iterate : f(init), f(f(init)), f(f(f(init))) ...
-            assertEquals(
-                    iterate(5, i -> i + 5).take(3),
-                    Iter(5, 10, 15)
-            );
-            assertEquals(
-                    iterate(5, 3, i -> i + 5),
-                    Iter(5, 10, 15)
-            );
-            assertEquals(iterate(0, 5, i -> i + 1), Iter(0, 1, 2, 3, 4));
-        });
-
-        test("unfold", () -> {
-            assertEquals(
-                    // 初始状态 i = 1
-                    unfold(1, i -> {
-                        if (i > 3) return None();
-                            // 通过 pair 返回值同时更新状态
-                        else return Some(Pair(i.toString(), i + 1));
-                    }),
-                    range(1, 4).map(Object::toString)
-            );
-            assertEquals(unfold("!", s -> Some(Pair(s, s + "!"))).take(5), Iter("!", "!!", "!!!", "!!!!", "!!!!!"));
-            assertEquals(unfold("!", s -> s.length() > 5 ? None() : Some(Pair(s, s + "!"))), Iter("!", "!!", "!!!", "!!!!", "!!!!!"));
-        });
-
-        test("continually", () -> {
-            try (val in = new ByteArrayInputStream("Hello".getBytes(StandardCharsets.UTF_8))) {
-                try (val buf = new BufferedInputStream(in)) {
-                    assertEquals(
-                            continually(Funs.Sneaky.sneak(() -> buf.read())).takeWhile(i -> i != -1),
-                            Iter('H', 'e', 'l', 'l', 'o').map(it -> ((int) it))
-                    );
-                }
-            } catch (IOException ignored) {}
-        });
-    }
-
     static void iter_funs() {
         // 所有迭代器方法, 都有两个版本
         // 1. 静态方法
@@ -1184,6 +1009,181 @@ public interface Example {
         test("toStream", () -> {});
 
         test("buffered", () -> {});
+    }
+
+    static void iter_factory() {
+        assertEquals(
+                empty(),
+                Iter()
+        );
+
+        assertEquals(
+                single(1),
+                Iter(1)
+        );
+
+        test("fill", () -> {
+            assertEquals(
+                    Iter.fill(5, () -> 42),
+                    Iter(42, 42, 42, 42, 42)
+            );
+            assertEquals(
+                    Iter.fill(5, 3, () -> "A").map(Iter::toList),
+                    Iter(
+                            List("A", "A", "A"),
+                            List("A", "A", "A"),
+                            List("A", "A", "A"),
+                            List("A", "A", "A"),
+                            List("A", "A", "A")
+                    )
+            );
+            assertEquals(
+                    Iter.fill(5, 3, 2, () -> "A").map(it -> it.map(Iter::toList).toList()),
+                    Iter(
+                            List(
+                                    List("A", "A"),
+                                    List("A", "A"),
+                                    List("A", "A")
+                            ),
+                            List(
+                                    List("A", "A"),
+                                    List("A", "A"),
+                                    List("A", "A")
+                            ),
+                            List(
+                                    List("A", "A"),
+                                    List("A", "A"),
+                                    List("A", "A")
+                            ),
+                            List(
+                                    List("A", "A"),
+                                    List("A", "A"),
+                                    List("A", "A")
+                            ),
+                            List(
+                                    List("A", "A"),
+                                    List("A", "A"),
+                                    List("A", "A")
+                            )
+                    )
+            );
+
+            assertEquals(
+                    fill(2, () -> 1),
+                    Iter(1, 1)
+            );
+            assertEquals(
+                    fill(5, () -> "hello"),
+                    Iter("hello", "hello", "hello", "hello", "hello")
+            );
+        });
+
+        test("tabulate", () -> {
+            assertEquals(
+                    tabulate(3, Object::toString),
+                    range(0, 3).map(Object::toString)
+            );
+            assertEquals(
+                    tabulate(5, i -> "hello " + i),
+                    Iter("hello 0", "hello 1", "hello 2", "hello 3", "hello 4")
+            );
+            assertEquals(
+                    tabulate(5, i -> i),
+                    Iter(0, 1, 2, 3, 4))
+            ;
+            assertEquals(
+                    tabulate(5, 3, Data::Pair).map(Iter::toList),
+                    Iter(
+                            List(Tuple(0, 0), Tuple(0, 1), Tuple(0, 2)),
+                            List(Tuple(1, 0), Tuple(1, 1), Tuple(1, 2)),
+                            List(Tuple(2, 0), Tuple(2, 1), Tuple(2, 2)),
+                            List(Tuple(3, 0), Tuple(3, 1), Tuple(3, 2)),
+                            List(Tuple(4, 0), Tuple(4, 1), Tuple(4, 2))
+                    )
+            );
+            assertEquals(
+                    tabulate(5, 3, 2, Data::Tuple).map(it1 -> it1.map(Iter::toList).toList()),
+                    Iter(
+                            List(List(Tuple(0, 0, 0), Tuple(0, 0, 1)), List(Tuple(0, 1, 0), Tuple(0, 1, 1)), List(Tuple(0, 2, 0), Tuple(0, 2, 1))),
+                            List(List(Tuple(1, 0, 0), Tuple(1, 0, 1)), List(Tuple(1, 1, 0), Tuple(1, 1, 1)), List(Tuple(1, 2, 0), Tuple(1, 2, 1))),
+                            List(List(Tuple(2, 0, 0), Tuple(2, 0, 1)), List(Tuple(2, 1, 0), Tuple(2, 1, 1)), List(Tuple(2, 2, 0), Tuple(2, 2, 1))),
+                            List(List(Tuple(3, 0, 0), Tuple(3, 0, 1)), List(Tuple(3, 1, 0), Tuple(3, 1, 1)), List(Tuple(3, 2, 0), Tuple(3, 2, 1))),
+                            List(List(Tuple(4, 0, 0), Tuple(4, 0, 1)), List(Tuple(4, 1, 0), Tuple(4, 1, 1)), List(Tuple(4, 2, 0), Tuple(4, 2, 1))))
+            );
+        });
+
+        test("range", () -> {
+            assertEquals(
+                    range(1, 7),
+                    concat(List(1, 2), List(3, 4), List(5, 6))
+            );
+            assertEquals(
+                    range(1, 4),
+                    Iter(1, 2, 3)
+            );
+            assertEquals(
+                    range(3, 0, -1),
+                    Iter(3, 2, 1)
+            );
+            assertEquals(
+                    range(1, 10, 2),
+                    Iter(1, 3, 5, 7, 9)
+            );
+            assertEquals(range(Integer.MAX_VALUE - 3, Integer.MAX_VALUE, 2), Iter(2147483644, 2147483646));
+            assertEquals(range(1, 5, 2), Iter(1, 3));
+            assertEquals(range(1, -5, -2), Iter(1, -1, -3));
+        });
+
+        test("from", () -> {
+            assertEquals(
+                    from(1).take(3),
+                    Iter(1, 2, 3)
+            );
+            assertEquals(
+                    from(1, 2).take(3),
+                    Iter(1, 3, 5)
+            );
+            assertEquals(from(1, 2).take(3), Iter(1, 3, 5));
+            assertEquals(from(1, -2).take(3), Iter(1, -1, -3));
+        });
+
+        test("iterate", () -> {
+            // iterate : f(init), f(f(init)), f(f(f(init))) ...
+            assertEquals(
+                    iterate(5, i -> i + 5).take(3),
+                    Iter(5, 10, 15)
+            );
+            assertEquals(
+                    iterate(5, 3, i -> i + 5),
+                    Iter(5, 10, 15)
+            );
+            assertEquals(iterate(0, 5, i -> i + 1), Iter(0, 1, 2, 3, 4));
+        });
+
+        test("unfold", () -> {
+            assertEquals(
+                    // 初始状态 i = 1
+                    unfold(1, i -> {
+                        if (i > 3) return None();
+                            // 通过 pair 返回值同时更新状态
+                        else return Some(Pair(i.toString(), i + 1));
+                    }),
+                    range(1, 4).map(Object::toString)
+            );
+            assertEquals(unfold("!", s -> Some(Pair(s, s + "!"))).take(5), Iter("!", "!!", "!!!", "!!!!", "!!!!!"));
+            assertEquals(unfold("!", s -> s.length() > 5 ? None() : Some(Pair(s, s + "!"))), Iter("!", "!!", "!!!", "!!!!", "!!!!!"));
+        });
+
+        test("continually", () -> {
+            try (val in = new ByteArrayInputStream("Hello".getBytes(StandardCharsets.UTF_8))) {
+                try (val buf = new BufferedInputStream(in)) {
+                    assertEquals(
+                            continually(Funs.Sneaky.sneak(() -> buf.read())).takeWhile(i -> i != -1),
+                            Iter('H', 'e', 'l', 'l', 'o').map(it -> ((int) it))
+                    );
+                }
+            } catch (IOException ignored) {}
+        });
     }
 
     static void predicates() {
